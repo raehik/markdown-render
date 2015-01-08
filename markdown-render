@@ -1,0 +1,114 @@
+#!/usr/bin/env bash
+#
+# Render a Markdown file or stdin to HTML on stdout.
+#
+# Wraps the Markdown in HTML tags including charset and CSS file
+# definition.
+#
+
+# default title if none specified:
+#   if 2nd line is =======, 1st line
+#     (note that we can check lines of stdin using head as per normal)
+#   else if file, file name
+#   else, $def_title
+def_title="Rendered Markdown file"
+
+# default CSS file
+# Note that the file is not checked for existence -- by using relative
+# links, you can set it to say "static/style.css"
+# TODO: explain this better
+def_css_file="$HOME/.style.css"
+
+# default favicon file
+def_favicon_file="$HOME/.favicon.png"
+
+# default Markdown renderer to use (must be absolute or in $PATH)
+# Must take input from stdin.
+def_renderer="redcarpet-shortlink.rb"
+
+
+
+usage() {
+    cat <<EOF
+Usage: ${0##*/} [-t title] [-c css_file] [-f favicon] [-r file] [file...]
+Render a Markdown file into a viewable HTML file.
+
+If no files are present, stdin is read.
+
+  Options:
+    -t          page title
+    -c          CSS file to apply to files
+    -f          favicon for page to link to
+    -r          Markdown renderer to use
+    -h          display this help message
+EOF
+}
+
+while getopts ":t:c:f:h" opt; do
+    case "$opt" in
+        t) # page title
+            title="$OPTARG"
+            ;;
+        c) # CSS file
+            css_file="$OPTARG"
+            ;;
+        f) # favicon
+            favicon_file="$OPTARG"
+            ;;
+        r) # Markdown renderer
+            renderer="$OPTARG"
+            ;;
+        h) # display usage message
+            usage
+            exit 0
+            ;;
+    esac
+done
+
+shift $((OPTIND-1))
+
+if [[ -z "$title" ]]; then
+    title="$def_title"
+fi
+
+if [[ -z "$css" ]]; then
+    css_file="$def_css_file"
+fi
+
+if [[ -z "$title" ]]; then
+    favicon_file="$def_favicon_file"
+fi
+
+if [[ -z "$renderer" ]]; then
+    renderer="$def_renderer"
+fi
+
+if [[ $# -eq 0 ]]; then
+    # no files, render stdin
+    body="$("$renderer")"
+else
+    # render each files in a separate call to the renderer and
+    # concatenate them together
+    # This is required because it seems Redcarpet doesn't work well with
+    # more than 1 file.
+    for file in "$@"
+    do
+        body="${body}$("$renderer" "$file")"
+    done
+fi
+
+
+
+echo \
+"<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset=\"utf-8\">
+        <title>$title</title>
+        <link rel=\"icon\" href=\"$favicon_file\">
+        <link rel=\"stylesheet\" type=\"text/css\" href=\"$css_file\">
+    </head>
+    <body>
+        $body
+    </body>
+</html>"
