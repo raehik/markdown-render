@@ -24,7 +24,7 @@ def_favicon_file="$HOME/.favicon.png"
 
 # default Markdown renderer to use (must be absolute or in $PATH)
 # Must take input from stdin.
-def_renderer="redcarpet-shortlink.rb"
+def_renderer="redcarpet-shortlink-wrapper.rb"
 
 
 
@@ -109,6 +109,8 @@ echo \
         <link rel=\"stylesheet\" type=\"text/css\" href=\"$css_file\">
     </head>
     <body>
-        $body
+<!-- START RENDERED MARKDOWN {{{ -->
+$body
+<!-- END RENDERED MARKDOWN }}} -->
     </body>
 </html>"
