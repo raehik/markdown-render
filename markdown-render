@@ -129,7 +129,7 @@ $body
 </html>"
 
 if [[ $open_html == true ]]; then
-    rendered_file="/tmp/${filename}.html"
+    rendered_file="/tmp/${filename##*/}.html"
     echo "$content" > "$rendered_file"
     firefox "$rendered_file"
 else
