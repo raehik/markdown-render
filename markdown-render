@@ -42,13 +42,14 @@ If no files are present, stdin is read.
     -t          page title
     -c          CSS file to apply to files
     -f          favicon for page to link to
+    -m          include MathJax
     -r          Markdown renderer to use
     -o          view rendered document in browser (firefox)
     -h          display this help message
 EOF
 }
 
-while getopts ":t:c:f:r:oh" opt; do
+while getopts ":t:c:f:mr:oh" opt; do
     case "$opt" in
         t) # page title
             title="$OPTARG"
@@ -58,6 +59,9 @@ while getopts ":t:c:f:r:oh" opt; do
             ;;
         f) # favicon
             favicon_file="$OPTARG"
+            ;;
+        m) # MathJax
+            use_mathjax=true
             ;;
         r) # Markdown renderer
             renderer="$OPTARG"
@@ -111,6 +115,10 @@ else
     filename="$1"
 fi
 
+if [[ $use_mathjax == true ]]; then
+    mathjax='<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>'
+fi
+
 
 
 content="<!DOCTYPE html>
@@ -120,6 +128,7 @@ content="<!DOCTYPE html>
         <title>$title</title>
         <link rel=\"icon\" href=\"$favicon_file\">
         <link rel=\"stylesheet\" type=\"text/css\" href=\"$css_file\">
+        $mathjax
     </head>
     <body>
 <!-- START RENDERED MARKDOWN {{{ -->
