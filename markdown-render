@@ -24,7 +24,7 @@ def_favicon_file="$HOME/.favicon.png"
 
 # default Markdown renderer to use (must be absolute or in $PATH)
 # Must take input from stdin.
-def_renderer="redcarpet-shortlink-wrapper.rb"
+def_renderer="redcarpet-custom-wrapper.rb"
 
 # default browser to open rendered files in
 def_browser="firefox"
