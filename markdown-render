@@ -19,6 +19,9 @@ def_title="Rendered Markdown file"
 # TODO: explain this better
 def_css_file="$HOME/.style.css"
 
+# default syntax highlighting CSS file
+def_highlight_css_file="$HOME/.style-pygments.css"
+
 # default favicon file
 def_favicon_file="$HOME/.favicon.png"
 
@@ -41,6 +44,7 @@ If no files are present, stdin is read.
   Options:
     -t          page title
     -c          CSS file to apply to files
+    -p          Syntax highlighting (Pygments) CSS file
     -f          favicon for page to link to
     -m          include MathJax
     -r          Markdown renderer to use
@@ -56,6 +60,9 @@ while getopts ":t:c:f:mr:oh" opt; do
             ;;
         c) # CSS file
             css_file="$OPTARG"
+            ;;
+        p) # highlight CSS file
+            highlight_css_file="$OPTARG"
             ;;
         f) # favicon
             favicon_file="$OPTARG"
@@ -89,6 +96,10 @@ fi
 
 if [[ -z "$css_file" ]]; then
     css_file="$def_css_file"
+fi
+
+if [[ -z "$highlight_css_file" ]]; then
+    highlight_css_file="$def_highlight_css_file"
 fi
 
 if [[ -z "$favicon_file" ]]; then
@@ -128,6 +139,7 @@ content="<!DOCTYPE html>
         <title>$title</title>
         <link rel=\"icon\" href=\"$favicon_file\">
         <link rel=\"stylesheet\" type=\"text/css\" href=\"$css_file\">
+        <link rel=\"stylesheet\" type=\"text/css\" href=\"$highlight_css_file\">
         $mathjax
     </head>
     <body>
