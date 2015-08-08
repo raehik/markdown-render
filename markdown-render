@@ -17,13 +17,13 @@ def_title="Rendered Markdown file"
 # Note that the file is not checked for existence -- by using relative
 # links, you can set it to say "static/style.css"
 # TODO: explain this better
-def_css_file="$HOME/.style.css"
+def_css_file="$HOME/.assets/style.css"
 
 # default syntax highlighting CSS file
-def_highlight_css_file="$HOME/.style-pygments.css"
+def_highlight_css_file="$HOME/.assets/style-pygments.css"
 
 # default favicon file
-def_favicon_file="$HOME/.favicon.png"
+def_favicon_file="$HOME/.assets/favicon.png"
 
 # default Markdown renderer to use (must be absolute or in $PATH)
 # Must take input from stdin.
