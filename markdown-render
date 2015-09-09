@@ -6,6 +6,8 @@
 # definition.
 #
 
+tmpdir="/tmp/markdown-render"
+
 # default title if none specified:
 #   if 2nd line is =======, 1st line
 #     (note that we can check lines of stdin using head as per normal)
@@ -53,6 +55,7 @@ If no files are present, stdin is read.
 EOF
 }
 
+# parse options
 while getopts ":t:c:f:mr:oh" opt; do
     case "$opt" in
         t) # page title
@@ -84,6 +87,18 @@ while getopts ":t:c:f:mr:oh" opt; do
 done
 
 shift $((OPTIND-1))
+
+# set up temp. dir
+if [[ ! -e "$tmpdir" ]]; then
+    # does not exist, so create
+    mkdir "$tmpdir"
+elif [[ -e "$tmpdir" ]] && [[ ! -d "$tmpdir" ]]; then
+    # exists but is not a directory; remove & recreate
+    rm -f "$tmpdir"
+    mkdir "$tmpdir"
+# else directory is already present
+fi
+
 
 if [[ -z "$title" ]]; then
     if [[ $# -eq 0 ]]; then
@@ -150,7 +165,7 @@ $body
 </html>"
 
 if [[ $open_html == true ]]; then
-    rendered_file="/tmp/${filename##*/}.html"
+    rendered_file="$tmpdir/${filename##*/}.html"
     echo "$content" > "$rendered_file"
     firefox "$rendered_file"
 else
