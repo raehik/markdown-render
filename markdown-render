@@ -31,8 +31,8 @@ def_favicon_file="$HOME/.assets/favicon.png"
 # Must take input from stdin.
 def_renderer="redcarpet-custom-wrapper.rb"
 
-# default browser to open rendered files in
-def_browser="firefox"
+# browser to open rendered files in
+browser="firefox"
 
 
 
@@ -167,7 +167,7 @@ $body
 if [[ $open_html == true ]]; then
     rendered_file="$tmpdir/${filename##*/}.html"
     echo "$content" > "$rendered_file"
-    firefox "$rendered_file"
+    $browser "$rendered_file"
 else
     echo "$content"
 fi
