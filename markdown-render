@@ -6,39 +6,35 @@
 # definition.
 #
 
+_BASHPLATE_DIR="$HOME/.local/share/bashplate"
+source "$_BASHPLATE_DIR/bashplate.sh"
+
 tmpdir="/tmp/markdown-render"
 
-# default title if none specified:
-#   if 2nd line is =======, 1st line
-#     (note that we can check lines of stdin using head as per normal)
-#   else if file, file name
-#   else, $def_title
+# default title if none specified
 def_title="Rendered Markdown file"
 
 # default CSS file
 # Note that the file is not checked for existence -- by using relative
 # links, you can set it to say "static/style.css"
 # TODO: explain this better
-def_css_file="$HOME/.assets/style.css"
+css_file="$HOME/.assets/style.css"
 
 # default syntax highlighting CSS file
-def_highlight_css_file="$HOME/.assets/style-pygments.css"
+highlight_css_file="$HOME/.assets/style-pygments.css"
 
 # default favicon file
-def_favicon_file="$HOME/.assets/favicon.png"
+favicon_file="$HOME/.assets/favicon.png"
 
 # default Markdown renderer to use (must be absolute or in $PATH)
 # Must take input from stdin.
-def_renderer="redcarpet-custom-wrapper.rb"
+renderer="redcarpet-custom-wrapper.rb"
 
 # browser to open rendered files in
-browser="firefox"
+browser="$FILE_OPENER"
 
-
-
-usage() {
-    cat <<EOF
-Usage: ${0##*/} [-t title] [-c css_file] [-f favicon] [-r file] [file...]
+_usage="\
+Usage: $_FILENAME [-t title] [-c css_file] [-f favicon] [-r file] [file...]
 Render a Markdown file into a viewable HTML file.
 
 If no files are present, stdin is read.
@@ -51,38 +47,20 @@ If no files are present, stdin is read.
     -m          include MathJax
     -r          Markdown renderer to use
     -o          view rendered document in browser (firefox)
-    -h          display this help message
-EOF
-}
+    -h          display this help message\
+"
 
 # parse options
 while getopts ":t:c:f:mr:oh" opt; do
     case "$opt" in
-        t) # page title
-            title="$OPTARG"
-            ;;
-        c) # CSS file
-            css_file="$OPTARG"
-            ;;
-        p) # highlight CSS file
-            highlight_css_file="$OPTARG"
-            ;;
-        f) # favicon
-            favicon_file="$OPTARG"
-            ;;
-        m) # MathJax
-            use_mathjax=true
-            ;;
-        r) # Markdown renderer
-            renderer="$OPTARG"
-            ;;
-        o) # view HTML in browser
-            open_html=true
-            ;;
-        h) # display usage message
-            usage
-            exit 0
-            ;;
+        t) title="$OPTARG" ;;
+        c) css_file="$OPTARG" ;;
+        p) highlight_css_file="$OPTARG" ;;
+        f) favicon_file="$OPTARG" ;;
+        m) use_mathjax=true ;;
+        r) renderer="$OPTARG" ;;
+        o) open_html=true ;;
+        h) _print_usage 0 ;;
     esac
 done
 
@@ -99,35 +77,19 @@ elif [[ -e "$tmpdir" ]] && [[ ! -d "$tmpdir" ]]; then
 # else directory is already present
 fi
 
-
 if [[ -z "$title" ]]; then
     if [[ $# -eq 0 ]]; then
+        # using stdin, no title to take: use default
         title="$def_title"
     else
-        title="$(basename "$1")"
-    # TODO: when >1 files, put names together?
+        # use filename of (first) file
+        title="${1##*/}"
     fi
-fi
-
-if [[ -z "$css_file" ]]; then
-    css_file="$def_css_file"
-fi
-
-if [[ -z "$highlight_css_file" ]]; then
-    highlight_css_file="$def_highlight_css_file"
-fi
-
-if [[ -z "$favicon_file" ]]; then
-    favicon_file="$def_favicon_file"
-fi
-
-if [[ -z "$renderer" ]]; then
-    renderer="$def_renderer"
 fi
 
 if [[ $# -eq 0 ]]; then
     # no files, render stdin
-    body="$("$renderer")"
+    body="$($renderer)"
     filename="markdown-render-out"
 else
     # render each files in a separate call to the renderer and
@@ -136,16 +98,14 @@ else
     # more than 1 file.
     for file in "$@"
     do
-        body="${body}$("$renderer" "$file")"
+        body="${body}$($renderer "$file")"
     done
-    filename="$1"
+    filename="${1##*/}"
 fi
 
-if [[ $use_mathjax == true ]]; then
+if [[ $use_mathjax ]]; then
     mathjax='<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>'
 fi
-
-
 
 content="<!DOCTYPE html>
 <html>
@@ -165,7 +125,7 @@ $body
 </html>"
 
 if [[ $open_html == true ]]; then
-    rendered_file="$tmpdir/${filename##*/}.html"
+    rendered_file="$tmpdir/${filename}.html"
     echo "$content" > "$rendered_file"
     $browser "$rendered_file"
 else
