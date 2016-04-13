@@ -31,7 +31,8 @@ favicon_file="$HOME/.assets/favicon.png"
 renderer="redcarpet-custom-wrapper.rb"
 
 # browser to open rendered files in
-browser="$FILE_OPENER"
+#browser="$FILE_OPENER"
+browser="firefox"
 
 _usage="\
 Usage: $_FILENAME [-t title] [-c css_file] [-f favicon] [-r file] [file...]
